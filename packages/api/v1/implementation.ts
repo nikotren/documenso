@@ -29,6 +29,8 @@ import { updateRecipient } from '@documenso/lib/server-only/recipient/update-rec
 import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
+import { createTemplate } from '@documenso/lib/server-only/template/create-template';
+import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
@@ -53,6 +55,7 @@ import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/pris
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
+import { tokenMiddleware } from './middleware/token';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -328,6 +331,57 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
+        },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'An error has occured while uploading the file',
+        },
+      };
+    }
+  }),
+
+  createTemplate: tokenMiddleware(async (args) => {
+    const { body } = args;
+
+    try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Create template is not available without S3 transport.',
+          },
+        };
+      }
+
+      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const documentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const template = await createTemplate({
+        title: body.title,
+        userId: 3,
+        templateDocumentDataId: documentData.id,
+      });
+
+      const templateDirectLink = await createTemplateDirectLink({
+        templateId: template.id,
+        userId: 3,
+      });
+
+      return {
+        status: 200,
+        body: {
+          uploadUrl: url,
+          templateId: template.id,
+          directLinkToken: templateDirectLink.token,
         },
       };
     } catch (err) {

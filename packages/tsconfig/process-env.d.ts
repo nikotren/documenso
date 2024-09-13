@@ -2,6 +2,8 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     NEXT_PUBLIC_WEBAPP_URL?: string;
     NEXT_PUBLIC_MARKETING_URL?: string;
+    NEXT_PUBLIC_TOKEN?: string;
+    NEXT_ADMIN_USER?: number;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;

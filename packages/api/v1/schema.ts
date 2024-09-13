@@ -134,6 +134,20 @@ export const ZCreateDocumentMutationSchema = z.object({
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
+export const ZCreateTemplateMutationSchema = z.object({
+  token: z.string(),
+  title: z.string().min(1),
+  externalId: z.string().nullish(),
+});
+
+export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationResponseSchema>;
+
+export const ZCreateTemplateMutationResponseSchema = z.object({
+  uploadUrl: z.string().min(1),
+  templateId: z.number(),
+  directLinkToken: z.string().nullish(),
+});
+
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
 
 export const ZCreateDocumentMutationResponseSchema = z.object({
@@ -403,7 +417,7 @@ export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigning
  * General
  */
 export const ZAuthorizationHeadersSchema = z.object({
-  authorization: z.string(),
+  authorization: z.string().nullish(),
 });
 
 export type TAuthorizationHeadersSchema = z.infer<typeof ZAuthorizationHeadersSchema>;
