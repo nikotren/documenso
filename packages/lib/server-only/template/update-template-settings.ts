@@ -1,6 +1,5 @@
 'use server';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import type { Template, TemplateMeta } from '@documenso/prisma/client';
@@ -76,10 +75,7 @@ export const updateTemplateSettings = async ({
 
   // Check if user has permission to set the global action auth.
   if (newGlobalActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
-    });
+    const isDocumentEnterprise = false;
 
     if (!isDocumentEnterprise) {
       throw new AppError(

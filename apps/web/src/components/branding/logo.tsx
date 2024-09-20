@@ -1,9 +1,11 @@
 import type { SVGAttributes } from 'react';
 
+import Image from 'next/image';
+
 export type LogoProps = SVGAttributes<SVGSVGElement>;
 
 export const Logo = ({ ...props }: LogoProps) => {
-  return (
+  /*return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2248 320" {...props}>
       <path
         fill="currentColor"
@@ -26,5 +28,7 @@ export const Logo = ({ ...props }: LogoProps) => {
         d="M97.4 211.5h-.1v.1Zm11.1 11.2 18.2.8c-7.9 0-13.6-.3-18.2-.8Zm-11.9-31c0-.8-.2-1.6-.4-2.4l.2 1.6.1 2c0 7.8.2 13.5.8 18.1v.5l-.7-19.8Zm-38.7-31.8c0 10.4 7.1 19 21.3 33.5v-25.6l-.2-.4c-3.8-4.9-3.9-6.7-3.9-7.5 0-.8.1-2.7 3.9-7.6l.2-.3v-25.6C65 140.8 58 149.4 58 159.9Zm94.7 81.1-.2-.1-.2-.1h-25.6c14.5 14.2 23.1 21.3 33.5 21.3 10.4 0 19-7 33.5-21.3H168l-.3.2c-5 3.8-6.8 3.9-7.6 3.9-.8 0-2.6-.1-7.5-3.9Z"
       />
     </svg>
-  );
+  );*/
+
+  return <Image src="/infina.png" width={144} height={77} alt="Infina" />;
 };

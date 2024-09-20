@@ -13,19 +13,20 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
 
-import { DirectTemplatePageView } from './direct-template';
-import { DirectTemplateAuthPageView } from './signing-auth-page';
+import { DirectTemplatePageView } from './../direct-template';
+import { DirectTemplateAuthPageView } from './../signing-auth-page';
 
 export type TemplatesDirectPageProps = {
   params: {
     token: string;
+    mail?: string;
   };
 };
 
 export default async function TemplatesDirectPage({ params }: TemplatesDirectPageProps) {
   setupI18nSSR();
 
-  const { token } = params;
+  const { token, mail } = params;
 
   if (!token) {
     redirect('/');
@@ -49,6 +50,8 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
     notFound();
   }
 
+  const initialEmail = mail ? decodeURIComponent(mail) : user?.email;
+
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
@@ -64,7 +67,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
   }
 
   return (
-    <SigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
+    <SigningProvider email={initialEmail} fullName={user?.name} signature={user?.signature}>
       <DocumentAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={directTemplateRecipient}

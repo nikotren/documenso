@@ -8,7 +8,7 @@ import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-field
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
-import { authenticatedProcedure, procedure, router } from '../trpc';
+import { authenticatedProcedure, maybeAuthenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZAddFieldsMutationSchema,
   ZAddTemplateFieldsMutationSchema,
@@ -50,14 +50,14 @@ export const fieldRouter = router({
       }
     }),
 
-  addTemplateFields: authenticatedProcedure
+  addTemplateFields: maybeAuthenticatedProcedure
     .input(ZAddTemplateFieldsMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { templateId, fields } = input;
 
       try {
         return await setFieldsForTemplate({
-          userId: ctx.user.id,
+          userId: -1,
           templateId,
           fields: fields.map((field) => ({
             id: field.nativeId,

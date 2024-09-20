@@ -21,6 +21,7 @@ import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
+import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
 import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
@@ -34,6 +35,7 @@ import { createTemplateDirectLink } from '@documenso/lib/server-only/template/cr
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   ZCheckboxFieldMeta,
@@ -43,6 +45,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import {
@@ -55,7 +58,6 @@ import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/pris
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
-import { tokenMiddleware } from './middleware/token';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -343,7 +345,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createTemplate: tokenMiddleware(async (args) => {
+  createTemplate: authenticatedMiddleware(async (args) => {
     const { body } = args;
 
     try {
@@ -371,6 +373,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         templateDocumentDataId: documentData.id,
       });
 
+      await updateTemplateSettings({
+        templateId: template.id,
+        userId: 3,
+        data: {
+          externalId: body.externalId || null,
+        },
+      });
+
       const templateDirectLink = await createTemplateDirectLink({
         templateId: template.id,
         userId: 3,
@@ -389,6 +399,35 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 404,
         body: {
           message: 'An error has occured while uploading the file',
+        },
+      };
+    }
+  }),
+
+  createApiToken: authenticatedMiddleware(async (args) => {
+    const { body } = args;
+
+    try {
+      const userId = body.userId || 3;
+      const tokenName = alphaid(32);
+
+      const token = await createApiToken({
+        userId: userId,
+        tokenName: tokenName,
+        expiresIn: 'HALF_HOUR',
+      });
+
+      return {
+        status: 200,
+        body: {
+          token: token.token,
+        },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'An error has occured while creating new token',
         },
       };
     }

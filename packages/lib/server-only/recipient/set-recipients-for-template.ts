@@ -1,4 +1,3 @@
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
@@ -37,20 +36,6 @@ export const setRecipientsForTemplate = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
-              },
-            },
-          },
-        },
-      ],
     },
     include: {
       directLink: true,
@@ -65,10 +50,7 @@ export const setRecipientsForTemplate = async ({
 
   // Check if user has permission to set the global action auth.
   if (recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
-    });
+    const isDocumentEnterprise = false;
 
     if (!isDocumentEnterprise) {
       throw new AppError(

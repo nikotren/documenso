@@ -24,35 +24,39 @@ export const executeWebhook = async ({ event, webhook, data }: ExecuteWebhookOpt
     webhookEndpoint: url,
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Documenso-Secret': secret ?? '',
-    },
-  });
-
-  const body = await response.text();
-
-  let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput = Prisma.JsonNull;
-
   try {
-    responseBody = JSON.parse(body);
-  } catch (err) {
-    responseBody = body;
-  }
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Documenso-Secret': secret ?? '',
+      },
+    });
 
-  await prisma.webhookCall.create({
-    data: {
-      url,
-      event,
-      status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
-      requestBody: payload as Prisma.InputJsonValue,
-      responseCode: response.status,
-      responseBody,
-      responseHeaders: Object.fromEntries(response.headers.entries()),
-      webhookId: webhook.id,
-    },
-  });
+    const body = await response.text();
+
+    let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput = Prisma.JsonNull;
+
+    try {
+      responseBody = JSON.parse(body);
+    } catch (err) {
+      responseBody = body;
+    }
+
+    await prisma.webhookCall.create({
+      data: {
+        url,
+        event,
+        status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
+        requestBody: payload as Prisma.InputJsonValue,
+        responseCode: response.status,
+        responseBody,
+        responseHeaders: Object.fromEntries(response.headers.entries()),
+        webhookId: webhook.id,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };

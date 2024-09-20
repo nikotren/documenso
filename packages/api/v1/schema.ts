@@ -135,12 +135,21 @@ export const ZCreateDocumentMutationSchema = z.object({
 });
 
 export const ZCreateTemplateMutationSchema = z.object({
-  token: z.string(),
   title: z.string().min(1),
   externalId: z.string().nullish(),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationResponseSchema>;
+
+export const ZCreateApiTokenMutationSchema = z.object({
+  userId: z.number(),
+});
+
+export type TCreateApiTokenMutationSchema = z.infer<typeof ZCreateTemplateMutationResponseSchema>;
+
+export const ZCreateApiTokenMutationResponseSchema = z.object({
+  token: z.string(),
+});
 
 export const ZCreateTemplateMutationResponseSchema = z.object({
   uploadUrl: z.string().min(1),

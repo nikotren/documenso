@@ -69,7 +69,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       downloadLink: documentOwnerDownloadLink,
     });
 
-    await mailer.sendMail({
+    /*await mailer.sendMail({
       to: [
         {
           name: owner.name || '',
@@ -89,7 +89,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           content: Buffer.from(completedDocument),
         },
       ],
-    });
+    });*/
 
     await prisma.documentAuditLog.create({
       data: createDocumentAuditLogData({

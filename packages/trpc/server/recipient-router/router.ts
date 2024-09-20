@@ -5,7 +5,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
-import { authenticatedProcedure, procedure, router } from '../trpc';
+import { authenticatedProcedure, maybeAuthenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZAddSignersMutationSchema,
   ZAddTemplateSignersMutationSchema,
@@ -42,14 +42,14 @@ export const recipientRouter = router({
       }
     }),
 
-  addTemplateSigners: authenticatedProcedure
+  addTemplateSigners: maybeAuthenticatedProcedure
     .input(ZAddTemplateSignersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId, signers, teamId } = input;
 
         return await setRecipientsForTemplate({
-          userId: ctx.user.id,
+          userId: -1,
           teamId,
           templateId,
           recipients: signers.map((signer) => ({

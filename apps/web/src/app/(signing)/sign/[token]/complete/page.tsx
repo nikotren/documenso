@@ -118,7 +118,7 @@ export default async function CompletedSigningPage({
           })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
-            {truncatedTitle}
+            {document.title}
           </Badge>
 
           {/* Card with recipient */}

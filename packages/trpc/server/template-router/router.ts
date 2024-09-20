@@ -179,13 +179,13 @@ export const templateRouter = router({
       }
     }),
 
-  getTemplateWithDetailsById: authenticatedProcedure
+  getTemplateWithDetailsById: maybeAuthenticatedProcedure
     .input(ZGetTemplateWithDetailsByIdQuerySchema)
     .query(async ({ input, ctx }) => {
       try {
         return await getTemplateWithDetailsById({
           id: input.id,
-          userId: ctx.user.id,
+          userId: ctx?.user?.id ?? 3,
         });
       } catch (err) {
         console.error(err);
@@ -198,15 +198,15 @@ export const templateRouter = router({
     }),
 
   // Todo: Add API
-  updateTemplateSettings: authenticatedProcedure
+  updateTemplateSettings: maybeAuthenticatedProcedure
     .input(ZUpdateTemplateSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId, teamId, data, meta } = input;
 
-        const userId = ctx.user.id;
-
         const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
+        const userId = 3;
 
         return await updateTemplateSettings({
           userId,

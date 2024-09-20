@@ -2,6 +2,8 @@ import { initContract } from '@ts-rest/core';
 
 import {
   ZAuthorizationHeadersSchema,
+  ZCreateApiTokenMutationResponseSchema,
+  ZCreateApiTokenMutationSchema,
   ZCreateDocumentFromTemplateMutationResponseSchema,
   ZCreateDocumentFromTemplateMutationSchema,
   ZCreateDocumentMutationResponseSchema,
@@ -97,6 +99,18 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Upload a new template and get a presigned URL',
+    },
+
+    createApiToken: {
+      method: 'POST',
+      path: '/api/v1/api-token',
+      body: ZCreateApiTokenMutationSchema,
+      responses: {
+        200: ZCreateApiTokenMutationResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Creates temporary API token for a template',
     },
 
     deleteTemplate: {
