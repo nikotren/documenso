@@ -1,7 +1,5 @@
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource } from '@documenso/prisma/client';
@@ -129,7 +127,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             : undefined,
       });
 
-      await mailer.sendMail({
+      /*await mailer.sendMail({
         to: [
           {
             name: recipient.name,
@@ -152,7 +150,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             content: Buffer.from(completedDocument),
           },
         ],
-      });
+      });*/
 
       await prisma.documentAuditLog.create({
         data: createDocumentAuditLogData({
