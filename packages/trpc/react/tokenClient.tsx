@@ -69,19 +69,9 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
           condition: (op) => op.context.skipBatch === true,
           true: httpLink({
             url: `${getBaseUrl()}/api/trpc`,
-            headers() {
-              return {
-                Authorization: `Bearer api_nct0919539b3d49r`,
-              };
-            },
           }),
           false: httpBatchLink({
             url: `${getBaseUrl()}/api/trpc`,
-            headers() {
-              return {
-                Authorization: `Bearer api_nct0919539b3d49r`,
-              };
-            },
           }),
         }),
       ],
